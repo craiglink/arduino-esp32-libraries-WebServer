@@ -594,9 +594,12 @@ void WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeys
   _headerKeysCount = headerKeysCount + 1;
   if (_currentHeaders)
      delete[]_currentHeaders;
+  int i = 0;
   _currentHeaders = new RequestArgument[_headerKeysCount];
-  _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
-  for (int i = 1; i < _headerKeysCount; i++){
+#ifdef WEBSERVER_AUTH  
+  _currentHeaders[i++].key = FPSTR(AUTHORIZATION_HEADER);
+#endif // WEBSERVER_AUTH    
+  for (; i < _headerKeysCount; i++){
     _currentHeaders[i].key = headerKeys[i-1];
   }
 }
@@ -672,6 +675,7 @@ void WebServer::_finalizeResponse() {
 
 String WebServer::_responseCodeToString(int code) {
   switch (code) {
+#ifdef WEBSERVER_RESPONSE_CODE_TO_STRING    
     case 100: return F("Continue");
     case 101: return F("Switching Protocols");
     case 200: return F("OK");
@@ -712,6 +716,7 @@ String WebServer::_responseCodeToString(int code) {
     case 503: return F("Service Unavailable");
     case 504: return F("Gateway Time-out");
     case 505: return F("HTTP Version not supported");
+#endif    
     default:  return F("");
   }
 }
