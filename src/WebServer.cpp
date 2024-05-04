@@ -32,12 +32,12 @@
 #include "detail/RequestHandlersImpl.h"
 #include "MD5Builder.h"
 
-#ifdef WEBSERVER_AUTH
+#ifdef ENABLE_AUTHENTICATION
 static const char AUTHORIZATION_HEADER[] = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
 static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] = "WWW-Authenticate";
-#endif // WEBSERVER_AUTH
+#endif // ENABLE_AUTHENTICATION
 
 static const char Content_Length[] = "Content-Length";
 
@@ -114,7 +114,7 @@ void WebServer::begin(uint16_t port) {
   _server.setNoDelay(true);
 }
 
-#ifdef WEBSERVER_AUTH
+#ifdef ENABLE_AUTHENTICATION
 
 String WebServer::_extractParam(String& authReq,const String& param,const char delimit){
   int _begin = authReq.indexOf(param);
@@ -244,7 +244,7 @@ void WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, co
   using namespace mime;
   send(401, String(FPSTR(mimeTable[html].mimeType)), authFailMsg);
 }
-#endif // WEBSERVER_AUTH
+#endif // ENABLE_AUTHENTICATION
 
 void WebServer::on(const Uri &uri, WebServer::THandlerFunction handler) {
   on(uri, HTTP_ANY, handler);
@@ -596,9 +596,9 @@ void WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeys
      delete[]_currentHeaders;
   int i = 0;
   _currentHeaders = new RequestArgument[_headerKeysCount];
-#ifdef WEBSERVER_AUTH  
+#ifdef ENABLE_AUTHENTICATION  
   _currentHeaders[i++].key = FPSTR(AUTHORIZATION_HEADER);
-#endif // WEBSERVER_AUTH    
+#endif // ENABLE_AUTHENTICATION    
   for (; i < _headerKeysCount; i++){
     _currentHeaders[i].key = headerKeys[i-1];
   }
@@ -675,7 +675,7 @@ void WebServer::_finalizeResponse() {
 
 String WebServer::_responseCodeToString(int code) {
   switch (code) {
-#ifdef WEBSERVER_RESPONSE_CODE_TO_STRING    
+#ifdef ENABLE_HTTP_STATUS_CODE_TO_STRING    
     case 100: return F("Continue");
     case 101: return F("Switching Protocols");
     case 200: return F("OK");
